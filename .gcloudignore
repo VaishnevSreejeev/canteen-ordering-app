@@ -1,0 +1,10 @@
+// filepath: d:\canteen_app_2\.gcloudignore
+# Ignore all files by default to prevent uploading local state or secrets.
+*
+
+# Now, un-ignore the files and directories needed for the build.
+!app.py
+!requirements.txt
+!schema.sql
+!Dockerfile
+!templates/

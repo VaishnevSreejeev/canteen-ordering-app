@@ -31,13 +31,12 @@
 <body>
     <div class="container">
         <div class="header">
-            {% if session.name %}
-                <p>Welcome, <strong>{{ session.name }}</strong>!</p>
-                <div class="header-nav">
-                    <a href="{{ url_for('order_history') }}" class="nav-btn">My Orders</a>
-                    <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
-                </div>
-            {% endif %}
+            <p>Welcome, {{ session.name }}!</p>
+            <nav class="header-nav">
+                <a href="{{ url_for('view_cart') }}" class="nav-btn">View Cart ({{ session.cart|length }})</a>
+                <a href="{{ url_for('order_history') }}" class="nav-btn">My Orders</a>
+                <a href="{{ url_for('logout') }}" class="nav-btn">Logout</a>
+            </nav>
         </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -48,65 +47,35 @@
             {% endif %}
         {% endwith %}
 
-        <h2>Today's Menu</h2>
-        {% if menu_items %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Unit Price (₹)</th>
-                        <th>Available</th>
-                        <th>Quantity</th>
-                        <th>Total Price (₹)</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in menu_items %}
-                        <tr>
-                            <form method="POST" action="{{ url_for('place_order') }}">
-                                <input type="hidden" name="item_name" value="{{ item.name }}">
-                                <td>{{ item.name }}</td>
-                                <td>{{ '%.2f' | format(item.price) }}</td>
-                                <td>{{ item.daily_quantity }}</td>
-                                <td>
-                                    <input type="number" class="quantity-input" name="quantity" value="1" min="1" max="{{ item.daily_quantity }}" data-price="{{ item.price }}" required>
-                                </td>
-                                <td class="total-price-cell">
-                                    <span class="total-price">{{ '%.2f' | format(item.price) }}</span>
-                                </td>
-                                <td>
-                                    <button type="submit">Order</button>
-                                </td>
-                            </form>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No items are available on the menu today.</p>
-        {% endif %}
+        <h2>Menu</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Unit Price (₹)</th>
+                    <th>Available</th>
+                    <th>Quantity</th>
+                    <th>Total Price (₹)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in menu_items %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>₹{{ "%.2f"|format(item.price) }}</td>
+                    <td>{{ item.daily_quantity }}</td>
+                    <td>
+                        <form action="{{ url_for('add_to_cart') }}" method="post" style="display:inline;">
+                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                            <input type="number" name="quantity" value="1" min="1" max="{{ item.daily_quantity }}" style="width: 50px;">
+                            <button type="submit">Add to Cart</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const quantityInputs = document.querySelectorAll('.quantity-input');
-
-            quantityInputs.forEach(input => {
-                input.addEventListener('input', function() {
-                    const quantity = parseInt(this.value, 10) || 0;
-                    const unitPrice = parseFloat(this.dataset.price);
-                    const totalPrice = quantity * unitPrice;
-
-                    const row = this.closest('tr');
-                    const totalPriceSpan = row.querySelector('.total-price');
-
-                    if (totalPriceSpan) {
-                        totalPriceSpan.textContent = totalPrice.toFixed(2);
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 </html>

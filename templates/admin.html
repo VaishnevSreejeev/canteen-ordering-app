@@ -19,7 +19,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Admin Dashboard</h1>
+        <h1>Admin Dashboard - All Orders</h1>
         <div class="nav-links">
             <a href="{{ url_for('admin_menu') }}">Manage Menu</a>
             <a href="{{ url_for('admin_logout') }}">Admin Logout</a>
@@ -33,55 +33,30 @@
             {% endif %}
         {% endwith %}
 
-        <h2>Today's Aggregated Demand</h2>
-        {% if aggregated_demand %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Total Quantity Ordered</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in aggregated_demand %}
-                        <tr>
-                            <td>{{ item.item_name }}</td>
-                            <td>{{ item.total_quantity }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No orders placed yet for today.</p>
-        {% endif %}
-
-        <h2>Today's Individual Orders</h2>
-        {% if orders %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Student ID</th>
-                        <th>Item</th>
-                        <th>Quantity</th>
-                        <th>Order Time</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in orders %}
-                        <tr>
-                            <td>{{ order.id }}</td>
-                            <td>{{ order.student_id }}</td>
-                            <td>{{ order.item_name }}</td>
-                            <td>{{ order.quantity }}</td>
-                            <td>{{ order.order_date.split('.')[0] }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No individual orders placed yet for today.</p>
-        {% endif %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Student</th>
+                    <th>Date</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.student_name }}</td>
+                    <td>{{ order.order_date }}</td>
+                    <td>₹{{ "%.2f"|format(order.total_price) }}</td>
+                    <td>{{ order.status }}</td>
+                    <td><a href="{{ url_for('admin_order_details', order_id=order.id) }}">View Details</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </body>
 </html>

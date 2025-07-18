@@ -13,39 +13,30 @@
         th { background-color: #f2f2f2; }
         .back-link { display: block; text-align: center; margin-top: 20px; text-decoration: none; color: #007bff; font-size: 1.1em; }
         .no-orders { text-align: center; color: #888; margin-top: 20px; }
+        .order-summary { margin-bottom: 20px; }
+        .order-summary h3 { margin: 0 0 10px 0; }
+        .order-summary p { margin: 0 0 10px 0; }
+        .order-summary ul { list-style-type: none; padding: 0; }
+        .order-summary li { background: #f9f9f9; margin: 5px 0; padding: 10px; border-radius: 4px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>My Order History</h1>
-        {% if orders %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Item</th>
-                        <th>Quantity</th>
-                        <th>Total Price (₹)</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in orders %}
-                        <tr>
-                            <td>{{ order.id }}</td>
-                            <td>{{ order.item_name }}</td>
-                            <td>{{ order.quantity }}</td>
-                            <td>{{ '%.2f' | format(order.total_price) }}</td>
-                            <td>{{ order.payment_status }}</td>
-                            <td>{{ order.order_date.split('.')[0] }}</td>
-                        </tr>
+        {% for order_data in orders_with_items %}
+            <div class="order-summary">
+                <h3>Order #{{ order_data.order.id }} - {{ order_data.order.status }}</h3>
+                <p>Date: {{ order_data.order.order_date }} | Total: ₹{{ "%.2f"|format(order_data.order.total_price) }}</p>
+                <ul>
+                    {% for item in order_data.items %}
+                        <li>{{ item.quantity }} x {{ item.item_name }}</li>
                     {% endfor %}
-                </tbody>
-            </table>
+                </ul>
+            </div>
+            <hr>
         {% else %}
-            <p class="no-orders">You have not placed any orders yet.</p>
-        {% endif %}
+            <p>You have no past orders.</p>
+        {% endfor %}
         <a href="{{ url_for('index') }}" class="back-link">Back to Menu</a>
     </div>
 </body>

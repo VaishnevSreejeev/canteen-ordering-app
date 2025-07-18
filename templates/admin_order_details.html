@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order #{{ order.id }} Details</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
+        .container { max-width: 800px; margin: auto; padding: 20px; background-color: #fff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1, h3 { color: #333; }
+        .order-details p { font-size: 1.1em; line-height: 1.6; }
+        .order-details strong { color: #555; }
+        .item-list { list-style-type: none; padding-left: 0; }
+        .item-list li { background-color: #fdfdfd; border: 1px solid #eee; padding: 10px; margin-bottom: 5px; border-radius: 4px; }
+        .order-actions { margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
+        .btn { padding: 10px 15px; border: none; border-radius: 4px; text-decoration: none; color: white; cursor: pointer; font-size: 1em; margin-right: 10px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-success { background-color: #28a745; }
+        .btn-danger { background-color: #dc3545; }
+        .btn-secondary { background-color: #6c757d; }
+        .message { padding: 10px; margin-bottom: 15px; border-radius: 4px; color: #155724; background-color: #d4edda; }
+        .error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Details for Order #{{ order.id }}</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="message {{ 'error' if category == 'error' else '' }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="order-details">
+            <p><strong>Student:</strong> {{ order.student_name }} ({{ order.student_id }})</p>
+            <p><strong>Date:</strong> {{ order.order_date }}</p>
+            <p><strong>Total Price:</strong> ₹{{ "%.2f"|format(order.total_price) }}</p>
+            <p><strong>Current Status:</strong> <strong>{{ order.status }}</strong></p>
+        </div>
+
+        <h3>Items in this Order</h3>
+        <ul class="item-list">
+            {% for item in items %}
+            <li>{{ item.quantity }} x {{ item.item_name }} @ ₹{{ "%.2f"|format(item.price_at_order) }} each</li>
+            {% endfor %}
+        </ul>
+
+        <div class="order-actions">
+            <h3>Update Order Status</h3>
+            <form action="{{ url_for('update_order_status', order_id=order.id) }}" method="post" style="display:inline;">
+                <input type="hidden" name="status" value="Completed">
+                <button type="submit" class="btn btn-success" {% if order.status == 'Completed' %}disabled{% endif %}>
+                    Mark as Completed
+                </button>
+            </form>
+            <form action="{{ url_for('update_order_status', order_id=order.id) }}" method="post" style="display:inline;">
+                <input type="hidden" name="status" value="Cancelled">
+                <button type="submit" class="btn btn-danger" {% if order.status == 'Cancelled' %}disabled{% endif %}>
+                    Mark as Cancelled
+                </button>
+            </form>
+            {% if order.status != 'Pending' %}
+            <form action="{{ url_for('update_order_status', order_id=order.id) }}" method="post" style="display:inline;">
+                <input type="hidden" name="status" value="Pending">
+                <button type="submit" class="btn btn-secondary">
+                    Revert to Pending
+                </button>
+            </form>
+            {% endif %}
+        </div>
+        <div style="margin-top: 30px;">
+            <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,8 +1,9 @@
 -- Drop existing tables to ensure a clean slate
+DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS menu_items;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS admins;
-DROP TABLE IF EXISTS menu_items;
 
 -- Table for student users with login credentials
 CREATE TABLE users (
@@ -19,23 +20,31 @@ CREATE TABLE admins (
     password TEXT NOT NULL
 );
 
--- Table for menu items with daily stock
+-- Table for menu items with daily stock and availability
 CREATE TABLE menu_items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT UNIQUE NOT NULL,
     price REAL NOT NULL,
-    is_available INTEGER NOT NULL DEFAULT 1, -- 1 for true (available), 0 for false
-    daily_quantity INTEGER NOT NULL DEFAULT 0 -- The available quantity for the day
+    daily_quantity INTEGER NOT NULL,
+    is_available INTEGER NOT NULL DEFAULT 1
 );
 
--- Table for orders placed by students with payment status
+-- Table for the parent order record
 CREATE TABLE orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     student_id TEXT NOT NULL,
-    item_name TEXT NOT NULL, -- This was likely 'item' before
-    quantity INTEGER NOT NULL,
     total_price REAL NOT NULL,
-    payment_status TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'Pending', -- e.g., Pending, Completed, Cancelled
     order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES users (student_id)
+);
+
+-- Table to store individual items within an order
+CREATE TABLE order_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER NOT NULL,
+    item_name TEXT NOT NULL,
+    quantity INTEGER NOT NULL,
+    price_at_order REAL NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders (id)
 );
