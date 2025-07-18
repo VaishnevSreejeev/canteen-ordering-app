@@ -3,26 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canteen Dashboard</title>
+    <title>Admin Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .container { max-width: 800px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
-        h1, h2 { text-align: center; }
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
+        .container { max-width: 900px; margin: auto; padding: 20px; background-color: #fff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1, h2 { text-align: center; color: #333; }
+        .nav-links { text-align: center; margin-bottom: 30px; }
+        .nav-links a { margin: 0 15px; text-decoration: none; color: #007bff; font-size: 1.1em; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
         th { background-color: #f2f2f2; }
-        .no-orders { text-align: center; color: #888; margin-top: 20px; }
-        .refresh-btn { display: block; width: fit-content; margin: 20px auto; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; }
-        .refresh-btn:hover { background-color: #0056b3; }
+        .message { padding: 10px; margin-bottom: 15px; border-radius: 4px; color: #155724; background-color: #d4edda; }
+        .error { background-color: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Canteen Dashboard</h1>
-        <h2>Current Orders</h2>
+        <h1>Admin Dashboard</h1>
+        <div class="nav-links">
+            <a href="{{ url_for('admin_menu') }}">Manage Menu</a>
+            <a href="{{ url_for('admin_logout') }}">Admin Logout</a>
+        </div>
 
-        <a href="{{ url_for('admin_dashboard') }}" class="refresh-btn">Refresh Orders</a>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="message {{ 'error' if category == 'error' else '' }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
+        <h2>Today's Aggregated Demand</h2>
+        {% if aggregated_demand %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Total Quantity Ordered</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in aggregated_demand %}
+                        <tr>
+                            <td>{{ item.item_name }}</td>
+                            <td>{{ item.total_quantity }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No orders placed yet for today.</p>
+        {% endif %}
+
+        <h2>Today's Individual Orders</h2>
         {% if orders %}
             <table>
                 <thead>
@@ -39,15 +72,15 @@
                         <tr>
                             <td>{{ order.id }}</td>
                             <td>{{ order.student_id }}</td>
-                            <td>{{ order.item }}</td>
+                            <td>{{ order.item_name }}</td>
                             <td>{{ order.quantity }}</td>
-                            <td>{{ order.order_date }}</td>
+                            <td>{{ order.order_date.split('.')[0] }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         {% else %}
-            <p class="no-orders">No orders placed yet.</p>
+            <p>No individual orders placed yet for today.</p>
         {% endif %}
     </div>
 </body>

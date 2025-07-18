@@ -5,67 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Canteen Order</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .container { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
-        h1, h2 { text-align: center; }
-        form div { margin-bottom: 10px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="number"], select { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
-        button { padding: 10px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background-color: #45a049; }
-        .logout-btn { background-color: #f44336; float: right; }
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
+        .container { max-width: 800px; margin: auto; padding: 20px; background-color: #fff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1, h2 { text-align: center; color: #333; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header p { margin: 0; font-size: 1.1em; }
+        .header-nav a { text-decoration: none; margin-left: 15px; }
+        .nav-btn { padding: 8px 12px; background-color: #007bff; color: white; border-radius: 4px; }
+        .nav-btn:hover { background-color: #0056b3; }
+        .logout-btn { padding: 8px 12px; background-color: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; }
         .logout-btn:hover { background-color: #da190b; }
-        .message { padding: 10px; margin-top: 15px; border-radius: 4px; color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; }
-        .error { padding: 10px; margin-top: 15px; border-radius: 4px; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; }
+        .message, .error { padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+        .message { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; }
+        .error { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; vertical-align: middle; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        input[type="number"] { width: 60px; padding: 5px; border-radius: 4px; border: 1px solid #ddd; }
+        button { padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .total-price-cell { font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>St. Xavier's Canteen Ordering</h1>
+        <div class="header">
+            {% if session.name %}
+                <p>Welcome, <strong>{{ session.name }}</strong>!</p>
+                <div class="header-nav">
+                    <a href="{{ url_for('order_history') }}" class="nav-btn">My Orders</a>
+                    <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+                </div>
+            {% endif %}
+        </div>
 
-        {# Display Flashed Messages #}
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="{{ category }}">{{ message }}</div>
+                    <div class="{{ 'message' if category == 'message' else 'error' }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
-        {% if student_id %}
-            <p>
-                Welcome, <strong>{{ student_id }}</strong>!
-                <a href="{{ url_for('logout') }}"><button class="logout-btn">Logout</button></a>
-            </p>
-            <h2>Place Your Order</h2>
-
-            <form method="POST" action="{{ url_for('place_order') }}">
-                <input type="hidden" name="student_id" value="{{ student_id }}">
-                <div>
-                    <label for="item">Select Item:</label>
-                    <select id="item" name="item" required>
-                        <option value="">--Please choose an option--</option>
-                        <option value="Meals">Meals (₹40)</option>
-                        <option value="Chai">Chai (₹10)</option>
-                        <option value="Snacks">Snacks (₹15-25)</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="quantity">Quantity:</label>
-                    <input type="number" id="quantity" name="quantity" min="1" value="1" required>
-                </div>
-                <button type="submit">Place Order</button>
-            </form>
+        <h2>Today's Menu</h2>
+        {% if menu_items %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Unit Price (₹)</th>
+                        <th>Available</th>
+                        <th>Quantity</th>
+                        <th>Total Price (₹)</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in menu_items %}
+                        <tr>
+                            <form method="POST" action="{{ url_for('place_order') }}">
+                                <input type="hidden" name="item_name" value="{{ item.name }}">
+                                <td>{{ item.name }}</td>
+                                <td>{{ '%.2f' | format(item.price) }}</td>
+                                <td>{{ item.daily_quantity }}</td>
+                                <td>
+                                    <input type="number" class="quantity-input" name="quantity" value="1" min="1" max="{{ item.daily_quantity }}" data-price="{{ item.price }}" required>
+                                </td>
+                                <td class="total-price-cell">
+                                    <span class="total-price">{{ '%.2f' | format(item.price) }}</span>
+                                </td>
+                                <td>
+                                    <button type="submit">Order</button>
+                                </td>
+                            </form>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         {% else %}
-            <h2>Enter Your Student ID</h2>
-            <form method="POST" action="{{ url_for('login') }}">
-                <div>
-                    <label for="student_id_input">Student ID:</label>
-                    <input type="text" id="student_id_input" name="student_id" required>
-                </div>
-                <button type="submit">Continue</button>
-            </form>
+            <p>No items are available on the menu today.</p>
         {% endif %}
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const quantityInputs = document.querySelectorAll('.quantity-input');
+
+            quantityInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    const quantity = parseInt(this.value, 10) || 0;
+                    const unitPrice = parseFloat(this.dataset.price);
+                    const totalPrice = quantity * unitPrice;
+
+                    const row = this.closest('tr');
+                    const totalPriceSpan = row.querySelector('.total-price');
+
+                    if (totalPriceSpan) {
+                        totalPriceSpan.textContent = totalPrice.toFixed(2);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
