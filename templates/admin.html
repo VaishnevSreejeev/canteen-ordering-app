@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canteen Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        h1, h2 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .no-orders { text-align: center; color: #888; margin-top: 20px; }
+        .refresh-btn { display: block; width: fit-content; margin: 20px auto; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; }
+        .refresh-btn:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Canteen Dashboard</h1>
+        <h2>Current Orders</h2>
+
+        <a href="{{ url_for('admin_dashboard') }}" class="refresh-btn">Refresh Orders</a>
+
+        {% if orders %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Student ID</th>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Order Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.student_id }}</td>
+                            <td>{{ order.item }}</td>
+                            <td>{{ order.quantity }}</td>
+                            <td>{{ order.order_date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="no-orders">No orders placed yet.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
