@@ -90,7 +90,7 @@ The project was built using an incremental model, with a deployable product afte
 ### Student-Facing Features
 * **Secure Authentication:** Students can register and log in with unique Student IDs. Passwords are securely hashed and never stored in plaintext.
 * **Dynamic Menu:** Displays a real-time list of available menu items, pulling directly from the database.
-* **Order Placement:** Students can specify a quantity and place an order, which atomically updates the available stock for that item.
+* **Order Placement:** Students can specify a quantity of each item, add them to cart and once they are done the site allows to proceed to checkout the cart and place order, which atomically updates the available stock for that item.
 * **Order History:** A dedicated page for students to view a history of all their past orders.
 
 ### Admin Panel Features
