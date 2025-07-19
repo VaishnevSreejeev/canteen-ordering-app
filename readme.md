@@ -3,8 +3,26 @@
 **Canteen Connect** is a full-stack web application developed as a submission for the "Builder's Day" challenge, the second round of the campus placement process for **KeyValue Software Systems**. This project was built from concept to cloud deployment in a rapid, iterative fashion, showcasing modern development practices and the strategic use of AI-powered tools to accelerate the build-test-deploy lifecycle.
 
 **Live Demo:** [https://canteen-service-1055948577637.asia-south1.run.app](https://canteen-service-1055948577637.asia-south1.run.app)
+To log in as a student, use the following credentials:
+* **Username:**
+    ```
+    S001
+    ```
+* **Password:**
+    ```
+    pass123
+    ```
 
----
+To log in as a canteen administrator, use the following credentials:
+* **Username:**
+    ```
+    chandrettan
+    ```
+* **Password:**
+    ```
+    adminpass
+    ```
+
 
 ## The Problem: The Daily Canteen Chaos
 
