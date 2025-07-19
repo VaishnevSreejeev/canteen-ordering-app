@@ -52,7 +52,7 @@ This project was completed by strategically leveraging modern AI development too
 This approach allowed me to:
 * **Focus on High-Level Strategy:** Instead of getting bogged down in syntax, I focused on database schema design, application flow, and the user experience.
 * **Accelerate Development:** Repetitive tasks like creating HTML templates, writing database queries, and setting up Flask routes were delegated, reducing development time significantly.
-* **Debug with Precision:** When deployment errors occurred, I used the AI to analyze logs and suggest targeted fixes, turning a potentially hours-long debugging session into a rapid, iterative process.
+* **Debug with Precision:** When deployment errors occurred, I could easily analyze logs and suggest targeted fixes, turning a potentially hours-long debugging session into a rapid, iterative process.
 
 In today's world, knowing how to effectively direct AI tools is a critical skill. This project is a testament to that philosophy—delivering a robust, deployed application at a speed unachievable with traditional methods alone.
 
