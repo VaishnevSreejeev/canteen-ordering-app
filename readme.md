@@ -110,7 +110,7 @@ The project was built using an incremental model, with a deployable product afte
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/your-username/canteen-connect.git](https://github.com/your-username/canteen-connect.git)
+    git clone https://github.com/VaishnevSreejeev/canteen-ordering-app.git
     cd canteen-connect
     ```
 
@@ -131,3 +131,6 @@ The project was built using an incremental model, with a deployable product afte
     ```
 
 5.  Open your browser and navigate to `http://127.0.0.1:5000`.
+
+
+Note: To view the live deployed site : Check [https://canteen-service-1055948577637.asia-south1.run.app](https://canteen-service-1055948577637.asia-south1.run.app) check above for login details
