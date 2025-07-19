@@ -77,8 +77,8 @@ The project was built using an incremental model, with a deployable product afte
 * **Cycle 1: Foundation & Setup:** Initialized the Flask application structure and established the base project files.
 * **Cycle 2: Database Schema Design:** Designed and implemented the database schema (`schema.sql`) for users, admins, menu items, and orders.
 * **Cycle 3: User Authentication:** Built the core functionality for student registration and login, including secure password hashing with Werkzeug.
-* **Cycle 4: Core Student Features:** Implemented the main student-facing features: viewing the menu, placing an order, and viewing order history.
-* **Cycle 5: Admin Panel Foundation:** Created the secure admin login and a basic dashboard structure.
+* **Cycle 4: Core Student Features:** Implemented the main student-facing features: viewing the menu, adding items to the cart, placing an order ad checkout, and viewing order history.
+* **Cycle 5: Admin Panel Foundation:** Created the secure admin login and a functional dashboard with actions to update status of orders and get an overview.
 * **Cycle 6: Full Admin CRUD Functionality:** Implemented complete Create, Read, Update, and Delete (CRUD) functionality for menu items.
 * **Cycle 7: Containerization:** Wrote the `Dockerfile` to containerize the application, making it portable and ready for cloud deployment.
 * **Cycle 8 & 9: Cloud Deployment & Debugging:** Deployed the container to Google Cloud Run. This involved multiple sub-cycles of identifying and fixing startup errors related to database initialization and environment-specific issues, hardening the application for a production environment.
