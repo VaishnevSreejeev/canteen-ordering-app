@@ -5,6 +5,7 @@ import sqlite3
 import datetime
 import threading
 import logging
+import time
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'your_very_secret_key_for_canteen_app_stage3_auth')
@@ -217,7 +218,8 @@ def place_order():
 
         session['cart'] = {}
         flash("Order placed successfully!", "message")
-        return redirect(url_for('order_history'))
+        # FIX: Redirect to the main menu to avoid the race condition with order_history.
+        return redirect(url_for('index'))
 
     except (sqlite3.Error, ValueError) as e:
         app.logger.error(f"Error during place_order: {e}")
@@ -228,34 +230,51 @@ def place_order():
 def order_history():
     if 'student_id' not in session: return redirect(url_for('student_login'))
     
-    try:
-        db = get_db()
-        orders_list = db.execute("SELECT * FROM orders WHERE student_id = ? ORDER BY order_date DESC", (session['student_id'],)).fetchall()
-        
-        if not orders_list:
-            return render_template('order_history.html', orders_with_items=[])
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            db = get_db()
+            orders_list = db.execute("SELECT * FROM orders WHERE student_id = ? ORDER BY order_date DESC", (session['student_id'],)).fetchall()
+            
+            if not orders_list:
+                return render_template('order_history.html', orders_with_items=[])
 
-        orders_dict = {order['id']: {'order': dict(order), 'items': []} for order in orders_list}
-        order_ids = tuple(orders_dict.keys())
+            orders_dict = {order['id']: {'order': dict(order), 'items': []} for order in orders_list}
+            order_ids = tuple(orders_dict.keys())
 
-        if not order_ids:
-            return render_template('order_history.html', orders_with_items=[])
+            if not order_ids:
+                return render_template('order_history.html', orders_with_items=[])
 
-        placeholders = ','.join('?' for _ in order_ids)
-        items_list = db.execute(f"SELECT * FROM order_items WHERE order_id IN ({placeholders})", order_ids).fetchall()
+            placeholders = ','.join('?' for _ in order_ids)
+            items_list = db.execute(f"SELECT * FROM order_items WHERE order_id IN ({placeholders})", order_ids).fetchall()
 
-        for item in items_list:
-            if item['order_id'] in orders_dict:
-                orders_dict[item['order_id']]['items'].append(dict(item))
+            for item in items_list:
+                if item['order_id'] in orders_dict:
+                    orders_dict[item['order_id']]['items'].append(dict(item))
 
-        orders_with_items = list(orders_dict.values())
-        
-        return render_template('order_history.html', orders_with_items=orders_with_items)
+            orders_with_items = list(orders_dict.values())
+            
+            # Success, return the rendered template
+            return render_template('order_history.html', orders_with_items=orders_with_items)
 
-    except Exception as e:
-        app.logger.error(f"Database error in order_history: {e}")
-        flash("Could not load order history due to a temporary issue. Please try again.", "error")
-        return redirect(url_for('index'))
+        except sqlite3.OperationalError as e:
+            app.logger.warning(f"Attempt {attempt + 1} failed for order_history: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(0.1)  # Wait 100ms before retrying
+            else:
+                app.logger.error(f"All {max_retries} retries failed for order_history: {e}")
+                return render_template('order_history.html', 
+                                       orders_with_items=[], 
+                                       error="Could not load order history due to a persistent database issue. Please try again later.")
+        except Exception as e:
+            app.logger.error(f"Unexpected error in order_history: {e}")
+            return render_template('order_history.html', 
+                                   orders_with_items=[], 
+                                   error="An unexpected error occurred while loading order history.")
+    # Fallback in case loop finishes unexpectedly
+    return render_template('order_history.html', 
+                           orders_with_items=[], 
+                           error="Could not load order history. Please try again.")
 
 # --- Admin Routes ---
 @app.before_request

@@ -18,11 +18,26 @@
         .order-summary p { margin: 0 0 10px 0; }
         .order-summary ul { list-style-type: none; padding: 0; }
         .order-summary li { background: #f9f9f9; margin: 5px 0; padding: 10px; border-radius: 4px; }
+        .message { color: green; }
+        .error { color: red; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>My Order History</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="{{ 'message' if category == 'message' else 'error' }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
         {% for order_data in orders_with_items %}
             <div class="order-summary">
                 <h3>Order #{{ order_data.order.id }} - {{ order_data.order.status }}</h3>
@@ -35,7 +50,9 @@
             </div>
             <hr>
         {% else %}
-            <p>You have no past orders.</p>
+            {% if not error %}
+                <p class="no-orders">You have no past orders.</p>
+            {% endif %}
         {% endfor %}
         <a href="{{ url_for('index') }}" class="back-link">Back to Menu</a>
     </div>
