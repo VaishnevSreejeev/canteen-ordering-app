@@ -72,7 +72,7 @@ In today's world, knowing how to effectively direct AI tools is a critical skill
 
 ## Iterative Development & Deployment
 
-The project was built using an incremental model, with a deployable (though not yet deployed) product after each cycle. This agile approach ensured a solid foundation and allowed for continuous progress.
+The project was built using an incremental model, with a deployable product after each cycle. This agile approach ensured a solid foundation and allowed for continuous progress.
 
 * **Cycle 1: Foundation & Setup:** Initialized the Flask application structure and established the base project files.
 * **Cycle 2: Database Schema Design:** Designed and implemented the database schema (`schema.sql`) for users, admins, menu items, and orders.
